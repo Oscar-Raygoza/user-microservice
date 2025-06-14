@@ -14,13 +14,14 @@ export default class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { page, limit, sortBy, sortOrder } = req.query;
+      const { page, limit, sortBy, sortOrder, showDeleted } = req.query;
 
       const users = await this._userRepository.findAll({
         page: Number(page) || 1,
         limit: Number(limit) || 10,
         sortBy: (sortBy as string) || "created_at",
         sortOrder: (sortOrder as "ASC" | "DESC") || "DESC",
+        showDeleted: Boolean(JSON.parse((showDeleted as string) || "false")),
       });
 
       res.status(StatusCodes.OK).json(users);
@@ -37,8 +38,9 @@ export default class UserController {
     try {
       const user = await this._userRepository.findById(req.params.id);
 
-      if (!user) {
+      if (!user.items.length) {
         return res.status(StatusCodes.NOT_FOUND).json({
+          code: StatusCodes.NOT_FOUND,
           message: [UserMessages.USER_NOT_FOUND],
         });
       }
@@ -103,7 +105,14 @@ export default class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      await this._userRepository.softDelete(req.params.id);
+      const { id } = req.params;
+      const hardDelete = req.query.hard === "true";
+
+      const deleteMethod = hardDelete
+        ? this._userRepository.hardDeleate
+        : this._userRepository.softDelete;
+
+      await deleteMethod.call(this._userRepository, id);
 
       res.status(StatusCodes.OK).json({
         code: StatusCodes.OK,

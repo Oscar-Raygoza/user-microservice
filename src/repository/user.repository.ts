@@ -25,10 +25,13 @@ export default class UserRepository {
       limit = 10,
       sortBy = "created_at",
       sortOrder = "DESC",
+      showDeleted = false,
     } = options;
     const offset = (page - 1) * limit;
 
-    const countQuery = `SELECT COUNT(*) as total FROM users;`;
+    const countQuery = showDeleted
+      ? `SELECT COUNT(*) as total FROM users;`
+      : `SELECT COUNT(*) as total FROM users WHERE deleted_at IS NULL;`;
 
     const [countResult] = await this.db.query<RowDataPacket[]>(countQuery);
 
@@ -37,6 +40,7 @@ export default class UserRepository {
     const dataQuery = `
       SELECT id, name, lastname, email, rfc, zip_code, created_at, updated_at, deleted_at
       FROM users
+      ${showDeleted ? "" : "WHERE deleted_at IS NULL"}
       ORDER BY ${sortBy} ${sortOrder}
       LIMIT ? OFFSET ?;
     `;
@@ -70,15 +74,13 @@ export default class UserRepository {
       INSERT INTO users (name, lastname, email, rfc, zip_code)
       VALUES (?, ?, ?, ?, ?);
     `;
-      const result = await this.db.query<ResultSetHeader>(query, [
+      await this.db.query<ResultSetHeader>(query, [
         user.name,
         user.lastname,
         user.email,
         user.rfc,
         user.zip_code,
       ]);
-
-      console.log(result);
     } catch (error) {
       throw error;
     }
@@ -104,6 +106,16 @@ export default class UserRepository {
   public async softDelete(id: string): Promise<boolean> {
     const query = `
       UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL;
+    `;
+
+    const result = await this.db.query<ResultSetHeader>(query, [id]);
+
+    return result.affectedRows > 0;
+  }
+
+  public async hardDeleate(id: string): Promise<boolean> {
+    const query = `
+      DELETE FROM users WHERE id = ?;
     `;
 
     const result = await this.db.query<ResultSetHeader>(query, [id]);

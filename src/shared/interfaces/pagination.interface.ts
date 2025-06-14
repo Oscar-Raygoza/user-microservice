@@ -5,6 +5,7 @@ export interface PaginationOptions {
   limit?: number;
   sortBy?: string;
   sortOrder?: SortOrder;
+  showDeleted?: boolean;
 }
 
 export interface PaginatedResponse<T> {
