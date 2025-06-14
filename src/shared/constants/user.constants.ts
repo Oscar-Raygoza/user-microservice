@@ -3,5 +3,5 @@ export const UserMessages = {
   USER_CREATED_SUCCESSFULLY: "User created successfully",
   USER_UPDATED_SUCCESSFULLY: "User updated successfully",
   USER_DELETED_SUCCESSFULLY: "User deleted successfully",
-  EMAIL_ALREADY_REGISTERED: "Email already registered",
+  EMAIL_ALREADY_REGISTERED: "Email or RFC already registered",
 };
