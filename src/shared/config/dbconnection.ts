@@ -60,8 +60,6 @@ export class DBConnection {
 
       console.log("Database connection successful ⚡️");
     } catch (error) {
-      console.log("Error:", error);
-
       throw error;
     }
   }
