@@ -17,4 +17,7 @@ async function start(): Promise<void> {
   }
 }
 
+
+console.log(process.env)
+
 start();
