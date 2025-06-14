@@ -4,7 +4,9 @@
   "description": "Prueba tecnica para startup",
   "main": "index.ts",
   "scripts": {
-    "dev": "nodemon --config nodemon.json src/index.ts"
+    "dev": "nodemon --config nodemon.json src/index.ts",
+    "start": "NODE_ENV=production node --env-file=.env dist/index.js",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
