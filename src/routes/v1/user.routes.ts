@@ -1,5 +1,8 @@
 import { Router } from "express";
 
+import { validate } from "../../middlewares/validate";
+import { createUserSchema, updateUserSchema } from "../../shared/validations/user.validations";
+
 // controllers
 import UserController from "../../controllers/user.controller";
 
@@ -11,7 +14,7 @@ const userController = new UserController();
  * @route POST /v1/users
  * @description Create new user
  */
-router.post("/", userController.create);
+router.post("/", validate(createUserSchema), userController.create);
 
 /**
  * @route GET /v1/users?page=1&limit=10&sortOrder=DESC
@@ -47,6 +50,6 @@ router.delete("/:id", userController.delete);
  * @body zip_code - zip code of the user
  * */
 
-router.put("/:id", userController.update);
+router.put("/:id", validate(updateUserSchema), userController.update);
 
 export default router;

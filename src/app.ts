@@ -19,18 +19,15 @@ import userRoutes from "./routes/v1/user.routes";
 import { createRateLimiter } from "./middlewares/rateLimiter";
 
 // db
-import { Database } from "./config/database";
-
-// errors middleware
-import errorHandler from "./middlewares/errorHandler";
+import { DBConnection } from "./shared/config/dbconnection";
 
 export default class App {
   private readonly app: Application;
-  private readonly database: Database;
+  private readonly database: DBConnection;
 
   constructor() {
     this.app = express();
-    this.database = Database.getInstance();
+    this.database = DBConnection.getInstance();
 
     this.initializeMiddlewares();
     this.initializeRoutes();

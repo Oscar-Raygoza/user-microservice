@@ -1,21 +1,21 @@
-import { Database } from "../config/database";
+import { DBConnection } from "../shared/config/dbconnection";
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 
 import {
   User,
   CreateUserInput,
   UpdateUserInput,
-} from "../interfaces/user.interface";
+} from "../shared/interfaces/user.interface";
 
 import {
   PaginationOptions,
   PaginatedResponse,
-} from "../interfaces/pagination.interface";
+} from "../shared/interfaces/pagination.interface";
 
-import { buildUpdateSetClause } from "../utils/QueryBuilder";
+import { buildUpdateSetClause } from "../shared/utils/QueryBuilder";
 
 export default class UserRepository {
-  private readonly db = Database.getInstance();
+  private readonly db = DBConnection.getInstance();
 
   public async findAll(
     options: PaginationOptions

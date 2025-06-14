@@ -4,8 +4,8 @@ import mysql, {
   type PoolOptions,
 } from "mysql2/promise";
 
-export class Database {
-  private static _instance: Database;
+export class DBConnection {
+  private static _instance: DBConnection;
 
   private readonly _pool: mysql.Pool;
 
@@ -26,12 +26,12 @@ export class Database {
     this._pool = mysql.createPool(this.options);
   }
 
-  public static getInstance(): Database {
-    if (!Database._instance) {
-      Database._instance = new Database();
+  public static getInstance(): DBConnection {
+    if (!DBConnection._instance) {
+      DBConnection._instance = new DBConnection();
     }
 
-    return Database._instance;
+    return DBConnection._instance;
   }
 
   public getPool(): mysql.Pool {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
-import { StatusCodes } from "../constants/http.constants";
-import { UserMessages } from "../constants/user.constants";
+import { StatusCodes } from "../shared/constants/http.constants";
+import { UserMessages } from "../shared/constants/user.constants";
 
 import UserRepository from "../repository/user.repository";
 
@@ -33,14 +33,15 @@ export default class UserController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const user = await this._userRepository.findById(req.params.id);
 
-      if (!user)
-        res
-          .status(StatusCodes.NOT_FOUND)
-          .json({ message: UserMessages.USER_NOT_FOUND });
+      if (!user) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: [UserMessages.USER_NOT_FOUND],
+        });
+      }
 
       res.status(StatusCodes.OK).json(user);
     } catch (error) {
@@ -54,16 +55,17 @@ export default class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userId = await this._userRepository.create(req.body);
+      await this._userRepository.create(req.body);
 
-      res
-        .status(StatusCodes.CREATED)
-        .json({ message: "User created successfully", id: userId });
+      res.status(StatusCodes.CREATED).json({
+        message: [UserMessages.USER_CREATED_SUCCESSFULLY],
+        code: StatusCodes.CREATED,
+      });
     } catch (error: any) {
       if (error?.code === "ER_DUP_ENTRY") {
         res.status(StatusCodes.CONFLICT).json({
           code: StatusCodes.CONFLICT,
-          message: UserMessages.EMAIL_ALREADY_REGISTERED,
+          message: [UserMessages.EMAIL_ALREADY_REGISTERED],
         });
       }
 
@@ -81,9 +83,16 @@ export default class UserController {
 
       res.status(StatusCodes.OK).json({
         code: StatusCodes.OK,
-        message: UserMessages.USER_UPDATED_SUCCESSFULLY,
+        message: [UserMessages.USER_UPDATED_SUCCESSFULLY],
       });
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.code === "ER_DUP_ENTRY") {
+        res.status(StatusCodes.CONFLICT).json({
+          code: StatusCodes.CONFLICT,
+          message: [UserMessages.EMAIL_ALREADY_REGISTERED],
+        });
+      }
+
       next(error);
     }
   };
@@ -96,12 +105,10 @@ export default class UserController {
     try {
       await this._userRepository.softDelete(req.params.id);
 
-      res
-        .status(StatusCodes.OK)
-        .json({
-          code: StatusCodes.OK,
-          message: UserMessages.USER_DELETED_SUCCESSFULLY,
-        });
+      res.status(StatusCodes.OK).json({
+        code: StatusCodes.OK,
+        message: [UserMessages.USER_DELETED_SUCCESSFULLY],
+      });
     } catch (error) {
       next(error);
     }
